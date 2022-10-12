@@ -18,7 +18,7 @@
 
   class BooksList {
     constructor() {
-      
+      this.favoriteBooks = [];
      
       this.filters = [];
 
@@ -52,47 +52,46 @@
     getElements() {
       this.dom = {};
       
+      
     }
     
     
-
-    initActions(){ //add favorite class
-      
-      
-
+    initActions() {
       //Przygotuj w niej referencję do listy wszystkich elementów .book__image w liście .booksList
-      const books1 = document.querySelectorAll(select.containerOf.bookList);
-      
-      
+      const bookList = document.querySelectorAll('.book__image');
+      console.log(bookList);
+
       // Następnie przejdź po każdym elemencie z tej listy.
-      for (const book of books1) {
-        //Dla każdego z nich dodaj nasłuchiwacz, który po wykryciu uruchomi funkcję, która...
-        book.addEventListener('dbclick', function(event){
-          //zatrzyma domyślne zachowanie przeglądarki (preventDefault),
-          event.preventDefault();
-          const idBooks = document.querySelector(select.containerOf.containerOfFavourites);
+      for(let book of bookList){
+        book.addEventListener('dbclick',function(){
           
-          //Jeśli kliknę image to:
-          if (book.classList.contains('favorite')){
-          //doda do klikniętego elementu klasę favorite,
-            book.classList.add('favorite'); 
-            //pobierze z jego data-id identyfikator książki,
-            book.getAttribute('data-id');
-            //i doda ten identyfikator do favoriteBooks
-            favoriteBooks.push(idBooks);
-          }
+         
+          
+          if(bookList.offsetParent.classList.contains('book__image')) {
+            const dataId = document.getAttribute('data-id');
+            if(!favoriteBooks.dataId && !bookList.classList.contains('.book__image')) {
+              favoriteBooks.push(dataId);
+              bookList.classList.add('favorite');
+            } else {
+              
+              bookList.classList.remove('favorite');
+            } 
+          } 
+          
         });
-        
+      
+   
+          
       }
-
-
-
-
-
-
+ 
     }
+
+
+
     
   }
+
+
 
   const favoriteBooks=[];
   console.log(favoriteBooks);

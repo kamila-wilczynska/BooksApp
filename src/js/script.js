@@ -1,4 +1,4 @@
-/* global Handlebars, utils, dataSource */ // eslint-disable-line no-unused-vars
+
 {
 
   'use strict';
@@ -9,21 +9,18 @@
       containerOfFavourites: '.book__image',
     },
     general: {
-      filterForm: '.filters',
+      typeOfBook: '.filters',
       filtersInputs: '.filters input',
     },
   };
 
-  const templates = {
-    menuBooks: Handlebars.compile(document.querySelector(select.templateOf.templateBook).innerHTML),
-    
-   
-  };
+ 
 
   class BooksList {
     constructor() {
       this.favoriteBooks = [];
       this.filters = [];
+      console.log(this.filters);
       
       console.log(this.favoriteBooks);
      
@@ -42,14 +39,16 @@
     }
 
     renderBooks() {
-     
-
-      for (const book of this.data) {
-        book.ratingBgc = this.determineRatingBgc(book.rating);
-        book.ratingWidth = book.rating * 10;
+      const templates = {
+        menuBooks: Handlebars.compile(document.querySelector(select.templateOf.templateBook).innerHTML),
+      };
+      
+      for (const templateBook of this.data) {
+        templateBook.ratingBgc = this.determineRatingBgc(templateBook.rating);
+        templateBook.ratingWidth = templateBook.rating * 10;
        
         //generate HTML from Handlebars
-        const generatedHTML = templates.menuBooks(book);
+        const generatedHTML = templates.menuBooks(templateBook);
         //create element using createElementFromHTML
         const bookHTML = utils.createDOMFromHTML(generatedHTML);
         //find menu container
@@ -61,7 +60,7 @@
 
     getElements() {
       this.dom = {};
-      this.dom.books = document.querySelector(select.templateOf.bookList);
+      this.dom.menuBooks = document.querySelector(select.templateOf.bookList);
       this.dom.typeOfBook = document.querySelector(select.general.typeOfBook);
       this.dom.filterInputs = document.querySelectorAll(select.general.filtersInputs);
       
@@ -70,12 +69,12 @@
     
     
     initActions() {
-      this.dom.books.addEventListener('click', (event) => {
+      this.dom.menuBooks.addEventListener('click', (event) => {
         console.log(event.target);
         event.preventDefault();
       });
 
-      this.dom.books.addEventListener('dblclick', (event) => {
+      this.dom.menuBooks.addEventListener('dblclick', (event) => {
         if (event.target.offsetParent.classList.contains('book__image')) {
           event.preventDefault();
           const bookId = event.target.offsetParent.getAttribute('data-id');
@@ -91,10 +90,12 @@
     
       
       this.dom.typeOfBook.addEventListener('click', (event) => {
-        
+        console.log(event.taret);
         
         if (
-          event.target.tagName == 'INPUT' && event.target.type == 'checkbox' && event.target.name == 'filter') {
+          event.target.tagName == 'INPUT' && 
+          event.target.type == 'checkbox' && 
+          event.target.name == 'filter') {
           if (event.target.checked) {
             this.filters.push(event.target.value);
           } else {
@@ -109,18 +110,20 @@
     }
 
     filterBooks() {
-      for (const book of this.data) {
+      for (const templateBook of this.data) {
         let hiddenBooks = false;
         for (const filter of this.filters) {
-          if (!book.details[filter]) {
+          if (!templateBook.details[filter]) {
             hiddenBooks = true;
             break;
           }
         }
+
+        
         if (hiddenBooks) {
-          document.querySelector(`[data-id="${book.id}"]`).classList.add('.hidden');
+          document.querySelector(`[data-id="${templateBook.id}"]`).classList.add('.hidden');
         } else {
-          document.querySelector(`[data-id="${book.id}"]`).classList.remove('.hidden');
+          document.querySelector(`[data-id="${templateBook.id}"]`).classList.remove('.hidden');
         }
       }
     }

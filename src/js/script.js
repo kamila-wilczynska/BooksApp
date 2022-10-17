@@ -1,11 +1,11 @@
-
+/* global Handlebars, utils, dataSource */ // eslint-disable-line no-unused-vars
 {
 
   'use strict';
   const select = {
     templateOf: {
       bookList: '.books-list',
-      templateBook: '#template-book',
+      book: '#template-book',
       containerOfFavourites: '.book__image',
     },
     general: {
@@ -14,7 +14,11 @@
     },
   };
 
- 
+  const templates = {
+    menuBooks: Handlebars.compile(document.querySelector(select.templateOf.book).innerHTML),
+    
+   
+  };
 
   class BooksList {
     constructor() {
@@ -39,16 +43,14 @@
     }
 
     renderBooks() {
-      const templates = {
-        menuBooks: Handlebars.compile(document.querySelector(select.templateOf.templateBook).innerHTML),
-      };
-      
-      for (const templateBook of this.data) {
-        templateBook.ratingBgc = this.determineRatingBgc(templateBook.rating);
-        templateBook.ratingWidth = templateBook.rating * 10;
+     
+
+      for (const book of this.data) {
+        book.ratingBgc = this.determineRatingBgc(book.rating);
+        book.ratingWidth = book.rating * 10;
        
         //generate HTML from Handlebars
-        const generatedHTML = templates.menuBooks(templateBook);
+        const generatedHTML = templates.menuBooks(book);
         //create element using createElementFromHTML
         const bookHTML = utils.createDOMFromHTML(generatedHTML);
         //find menu container
@@ -60,7 +62,7 @@
 
     getElements() {
       this.dom = {};
-      this.dom.menuBooks = document.querySelector(select.templateOf.bookList);
+      this.dom.books = document.querySelector(select.templateOf.bookList);
       this.dom.typeOfBook = document.querySelector(select.general.typeOfBook);
       this.dom.filterInputs = document.querySelectorAll(select.general.filtersInputs);
       
@@ -69,20 +71,21 @@
     
     
     initActions() {
-      this.dom.menuBooks.addEventListener('click', (event) => {
+      this.dom.books.addEventListener('click', (event) => {
         console.log(event.target);
         event.preventDefault();
       });
 
-      this.dom.menuBooks.addEventListener('dblclick', (event) => {
+      this.dom.books.addEventListener('dblclick', (event) => {
         if (event.target.offsetParent.classList.contains('book__image')) {
           event.preventDefault();
           const bookId = event.target.offsetParent.getAttribute('data-id');
+          const book = event.target.closest('.book__image');
           if (!this.favoriteBooks.includes(bookId)) {
-            event.target.offsetParent.classList.add('favorite');
+            book.classList.add('favorite');
             this.favoriteBooks.push(bookId);
           } else {
-            event.target.offsetParent.classList.remove('favorite');
+            book.classList.remove('favorite');
             this.favoriteBooks.splice(this.favoriteBooks.indexOf(bookId), 1);
           }
         }
@@ -90,12 +93,10 @@
     
       
       this.dom.typeOfBook.addEventListener('click', (event) => {
-        console.log(event.taret);
+        
         
         if (
-          event.target.tagName == 'INPUT' && 
-          event.target.type == 'checkbox' && 
-          event.target.name == 'filter') {
+          event.target.tagName == 'INPUT' && event.target.type == 'checkbox' && event.target.name == 'filter') {
           if (event.target.checked) {
             this.filters.push(event.target.value);
           } else {
@@ -110,20 +111,25 @@
     }
 
     filterBooks() {
-      for (const templateBook of this.data) {
-        let hiddenBooks = false;
+      for (const bookData of this.data) {
+        let hidden = false;
+
         for (const filter of this.filters) {
-          if (!templateBook.details[filter]) {
-            hiddenBooks = true;
+          if (!bookData.details[filter]) {
+            hidden = true;
             break;
           }
         }
-
-        
-        if (hiddenBooks) {
-          document.querySelector(`[data-id="${templateBook.id}"]`).classList.add('.hidden');
-        } else {
-          document.querySelector(`[data-id="${templateBook.id}"]`).classList.remove('.hidden');
+        if (hidden == true) {
+          const bookImage = document.querySelector(
+            '.book__image[data-id="' + bookData.id + '"]'
+          );
+          bookImage.classList.add('hidden');
+        } else if (hidden == false) {
+          const bookImage = document.querySelector(
+            '.book__image[data-id="' + bookData.id + '"]'
+          );
+          bookImage.classList.remove('hidden');
         }
       }
     }
